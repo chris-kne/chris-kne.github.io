@@ -1,48 +1,49 @@
 # SHMUG EMPIRE
+# ⚡ SHMUG EMPIRE ⚡
 
 Welcome to the Shmug ecosystem.
 
-This project contains experiments, games, crypto tools and NFT systems built by CurioCity.
+A creative internet playground mixing games, crypto tools and experimental tech.
 
 ---
 
-## Projects
+## 🌐 Website
 
-🔥 **SMG (ShmugzGold)**
-Polygon based token used inside the Shmug ecosystem.
-
-🎮 **Swat Pong**
-Retro fly-swatting pong game.
-
-🪙 **Crypto Tools**
-Trading bots, mining experiments and automation tools.
-
-🎨 **NFT Projects**
-Collections like Pot Heads and experimental generative NFTs.
+https://chris-kne.github.io
 
 ---
 
-## Website
+## 🎮 Games
 
-Coming soon via GitHub Pages.
+- 🐉 Dragon Pearl
+- 🐼 Panda River Crossing
+- 🪰 Swat Pong (coming soon)
 
 ---
 
-## Vision
+## ⛏ Mining Tools
 
-The Shmug Empire is a creative ecosystem mixing:
+Start mining with our referral links and guides.
+
+- GoMining referral
+- Mining tutorials
+- Crypto tools
+
+---
+
+## 🧠 Vision
+
+The Shmug Empire mixes:
 
 - Games
 - Crypto
 - NFTs
-- Experimental tech
+- Experimental technology
 - Weird internet culture
 
 ---
 
-## Creator
+## 👤 Creator
 
 CurioCity  
 Building strange things on the internet.
-![GitHub stars](https://img.shields.io/github/stars/yourname/repo)
-![License](https://img.shields.io/badge/license-MIT-green)
