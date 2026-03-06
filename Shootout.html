@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Panda vs Pepe Penalty</title>
 
+<style>
+body{
+background:#0b6623;
+text-align:center;
+font-family:Arial;
+color:white;
+}
+
+canvas{
+background:#1e7f3f;
+border:4px solid white;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🐼 Panda vs Pepe Penalty</h1>
+<p>Click left / middle / right to shoot</p>
+
+<h2 id="score">Score: 0</h2>
+
+<canvas id="game" width="900" height="500"></canvas>
+
+<audio id="kick">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9c5b63c8de.mp3">
+</audio>
+
+<audio id="cheer">
+<source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_cbc1b3e5d1.mp3">
+</audio>
+
+<script>
+
+let canvas=document.getElementById("game")
+let ctx=canvas.getContext("2d")
+
+let ballX=450
+let ballY=420
+let targetX=450
+
+let keeperX=420
+let dir=4
+
+let shot=false
+let score=0
+
+canvas.addEventListener("click",shoot)
+
+function shoot(e){
+
+if(shot) return
+
+let rect=canvas.getBoundingClientRect()
+let clickX=e.clientX-rect.left
+
+if(clickX<300) targetX=320
+else if(clickX<600) targetX=450
+else targetX=580
+
+shot=true
+
+document.getElementById("kick").play()
+
+}
+
+function drawStadium(){
+
+// crowd
+ctx.fillStyle="#444"
+ctx.fillRect(0,0,900,100)
+
+// field
+ctx.fillStyle="#1e7f3f"
+ctx.fillRect(0,100,900,400)
+
+// goal
+ctx.strokeStyle="white"
+ctx.lineWidth=5
+ctx.strokeRect(300,120,300,120)
+
+// penalty box
+ctx.strokeRect(250,120,400,200)
+
+}
+
+function panda(){
+
+ctx.font="40px Arial"
+ctx.fillText("🐼",430,470)
+
+}
+
+function keeper(){
+
+ctx.font="40px Arial"
+ctx.fillText("🐸",keeperX,170)
+
+keeperX+=dir
+
+if(keeperX<310 || keeperX>560){
+dir*=-1
+}
+
+}
+
+function ball(){
+
+ctx.beginPath()
+ctx.arc(ballX,ballY,10,0,Math.PI*2)
+ctx.fillStyle="white"
+ctx.fill()
+
+}
+
+function update(){
+
+ctx.clearRect(0,0,900,500)
+
+drawStadium()
+panda()
+keeper()
+ball()
+
+if(shot){
+
+ballY-=8
+ballX+=(targetX-ballX)*0.05
+
+if(ballY<170){
+
+// check save
+if(Math.abs(ballX-keeperX)<40){
+
+reset()
+
+}else{
+
+score++
+document.getElementById("score").innerText="Score: "+score
+document.getElementById("cheer").play()
+reset()
+
+}
+
+}
+
+}
+
+requestAnimationFrame(update)
+
+}
+
+function reset(){
+
+ballX=450
+ballY=420
+shot=false
+
+}
+
+update()
+
+</script>
+
+</body>
+</html>
