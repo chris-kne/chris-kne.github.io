@@ -1,205 +1,136 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+
 <title>Panda River Crossing</title>
 
 <style>
 
 body{
-background:#0b2e13;
+background:#0a0a0a;
 color:white;
 text-align:center;
 font-family:Arial;
-margin:0;
 }
 
-h1{
-color:#9cff9c;
+canvas{
+background:#001a33;
+border:4px solid #d4af37;
+box-shadow:0 0 20px #d4af37;
+margin-top:20px;
 }
 
-#gameCanvas{
-background:#1f5e3b;
-border:6px solid #4CAF50;
-display:block;
-margin:auto;
-touch-action:none;
-}
-
-.controls{
-margin-top:15px;
-}
-
-button{
-font-size:26px;
-padding:15px 25px;
+.controls button{
+width:90px;
+height:90px;
+font-size:28px;
 margin:6px;
-border-radius:10px;
-border:none;
-background:#4CAF50;
+border-radius:12px;
+background:linear-gradient(#3a7d3a,#1f4f1f);
 color:white;
-}
-
-button:active{
-background:#2e7d32;
+border:2px solid #d4af37;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h1>🐼 Panda Crossing River</h1>
+<h2>🐼 Panda River Crossing</h2>
 
-<canvas id="gameCanvas" width="600" height="600"></canvas>
+<canvas id="game" width="600" height="600"></canvas>
+
+<h3>Score: <span id="score">0</span></h3>
 
 <div class="controls">
 
-<div>
-<button onclick="move('up')">⬆</button>
-</div>
+<br>
+<button onclick="move(0,-40)">⬆</button>
 
-<div>
-<button onclick="move('left')">⬅</button>
-<button onclick="move('down')">⬇</button>
-<button onclick="move('right')">➡</button>
-</div>
+<br>
+
+<button onclick="move(-40,0)">⬅</button>
+<button onclick="move(40,0)">➡</button>
+
+<br>
+
+<button onclick="move(0,40)">⬇</button>
 
 </div>
 
 <script>
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("game")
+const ctx=canvas.getContext("2d")
 
-const grid = 30;
-const tile = canvas.width / grid;
+let panda={x:280,y:560}
 
-let panda = {x:15,y:15};
+let score=0
 
-let coins = [];
-let score = 0;
+let logs=[
+{x:0,y:300,speed:2},
+{x:200,y:200,speed:-3},
+{x:100,y:120,speed:2}
+]
 
-function spawnCoin(){
+document.addEventListener("keydown",e=>{
 
-coins.push({
-x:Math.floor(Math.random()*grid),
-y:Math.floor(Math.random()*grid)
-});
+if(e.key=="ArrowUp") move(0,-40)
+if(e.key=="ArrowDown") move(0,40)
+if(e.key=="ArrowLeft") move(-40,0)
+if(e.key=="ArrowRight") move(40,0)
+
+})
+
+function move(x,y){
+
+panda.x+=x
+panda.y+=y
 
 }
-
-for(let i=0;i<5;i++) spawnCoin();
 
 function draw(){
 
-ctx.fillStyle="#2e8b57";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.clearRect(0,0,600,600)
 
-drawRiver();
-drawCoins();
-drawPanda();
+ctx.fillStyle="green"
+ctx.fillRect(0,0,600,80)
 
-}
+ctx.fillStyle="green"
+ctx.fillRect(0,520,600,80)
 
-function drawRiver(){
+ctx.fillStyle="blue"
+ctx.fillRect(0,80,600,440)
 
-ctx.fillStyle="#1e90ff";
+ctx.fillStyle="white"
+ctx.fillRect(panda.x,panda.y,40,40)
 
-for(let i=10;i<20;i++){
+logs.forEach(log=>{
 
-ctx.fillRect(0,i*tile,canvas.width,tile);
+log.x+=log.speed
 
-}
+if(log.x>600) log.x=-120
+if(log.x<-120) log.x=600
 
-}
+ctx.fillStyle="brown"
+ctx.fillRect(log.x,log.y,120,40)
 
-function drawPanda(){
+})
 
-ctx.fillStyle="white";
-ctx.beginPath();
-ctx.arc(
-panda.x*tile + tile/2,
-panda.y*tile + tile/2,
-tile/2.2,
-0,
-Math.PI*2
-);
-ctx.fill();
+if(panda.y<80){
 
-ctx.fillStyle="black";
+score++
+document.getElementById("score").innerText=score
 
-ctx.beginPath();
-ctx.arc(panda.x*tile+tile*0.35,panda.y*tile+tile*0.35,4,0,Math.PI*2);
-ctx.arc(panda.x*tile+tile*0.65,panda.y*tile+tile*0.35,4,0,Math.PI*2);
-ctx.fill();
+panda.x=280
+panda.y=560
 
 }
 
-function drawCoins(){
-
-ctx.fillStyle="gold";
-
-coins.forEach(c=>{
-
-ctx.beginPath();
-ctx.arc(
-c.x*tile+tile/2,
-c.y*tile+tile/2,
-tile/3,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-});
-
 }
 
-function move(dir){
-
-if(dir=="up") panda.y--;
-if(dir=="down") panda.y++;
-if(dir=="left") panda.x--;
-if(dir=="right") panda.x++;
-
-wrap();
-
-checkCoin();
-
-draw();
-
-}
-
-function wrap(){
-
-if(panda.x<0) panda.x=grid-1;
-if(panda.x>=grid) panda.x=0;
-if(panda.y<0) panda.y=grid-1;
-if(panda.y>=grid) panda.y=0;
-
-}
-
-function checkCoin(){
-
-coins = coins.filter(c=>{
-
-if(c.x==panda.x && c.y==panda.y){
-
-score++;
-spawnCoin();
-return false;
-
-}
-
-return true;
-
-});
-
-}
-
-draw();
+setInterval(draw,60)
 
 </script>
 
