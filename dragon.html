@@ -7,7 +7,7 @@
 <style>
 
 body{
-background:black;
+background:#0a0a0a;
 color:white;
 text-align:center;
 font-family:Arial;
@@ -15,16 +15,51 @@ font-family:Arial;
 
 canvas{
 background:#020010;
-border:3px solid purple;
+border:4px solid #b8860b;
 box-shadow:0 0 25px purple;
 margin-top:20px;
 }
 
+/* bamboo buttons */
+
 .controls button{
-width:80px;
-height:80px;
-font-size:24px;
-margin:6px;
+width:90px;
+height:90px;
+font-size:28px;
+margin:8px;
+border-radius:12px;
+background:linear-gradient(#3a7d3a,#1f4f1f);
+color:white;
+border:2px solid #d4af37;
+}
+
+.controls button:hover{
+background:#2e8b57;
+}
+
+/* leaderboard bamboo panel */
+
+.leaderboard{
+background:#1a1a1a;
+border:3px solid #d4af37;
+width:300px;
+margin:auto;
+padding:10px;
+border-radius:10px;
+box-shadow:0 0 15px #d4af37;
+}
+
+input{
+padding:8px;
+margin:5px;
+}
+
+button.submit{
+background:#b8860b;
+color:black;
+border:none;
+padding:10px;
+border-radius:6px;
 }
 
 </style>
@@ -33,42 +68,62 @@ margin:6px;
 
 <body>
 
-<h1>🐉 Dragon Pearl</h1>
+<h2>🐉 Dragon Pearl</h2>
 
 <canvas id="game" width="600" height="600"></canvas>
 
-<h2>Score: <span id="score">0</span></h2>
+<h3>Score: <span id="score">0</span></h3>
 
 <div class="controls">
 
 <br>
 <button onclick="setDir(0,-20)">⬆</button>
+
 <br>
 
 <button onclick="setDir(-20,0)">⬅</button>
 <button onclick="setDir(20,0)">➡</button>
 
 <br>
+
 <button onclick="setDir(0,20)">⬇</button>
+
+</div>
+
+<br>
+
+<div class="leaderboard">
+
+<h3>🏮 Bamboo Leaderboard</h3>
+
+<input id="playerName" placeholder="Your name">
+
+<br>
+
+<button class="submit" onclick="submitScore()">Submit Score</button>
+
+<ul id="leaderboard"></ul>
 
 </div>
 
 <script>
 
-const canvas = document.getElementById("game")
-const ctx = canvas.getContext("2d")
+const canvas=document.getElementById("game")
+const ctx=canvas.getContext("2d")
 
-let dragon=[{x:300,y:300}]
-let pearl={x:200,y:200}
+let snake=[{x:300,y:300}]
+let food={x:200,y:200}
 
-let dx=20
+let dx=0
 let dy=0
 
 let score=0
 
 function setDir(x,y){
+
 dx=x
 dy=y
+
 }
 
 document.addEventListener("keydown",function(e){
@@ -80,9 +135,9 @@ if(e.key=="ArrowRight") setDir(20,0)
 
 })
 
-function drawDragon(){
+function drawSnake(){
 
-dragon.forEach((part,i)=>{
+snake.forEach((part,i)=>{
 
 ctx.fillStyle = (i==0) ? "orange" : "lime"
 
@@ -92,12 +147,12 @@ ctx.fillRect(part.x,part.y,20,20)
 
 }
 
-function drawPearl(){
+function drawFood(){
 
 ctx.fillStyle="gold"
 
 ctx.beginPath()
-ctx.arc(pearl.x+10,pearl.y+10,8,0,Math.PI*2)
+ctx.arc(food.x+10,food.y+10,8,0,Math.PI*2)
 ctx.fill()
 
 }
@@ -106,28 +161,35 @@ function game(){
 
 ctx.clearRect(0,0,600,600)
 
-let head={
-x:dragon[0].x+dx,
-y:dragon[0].y+dy
+if(dx===0 && dy===0){
+
+drawSnake()
+drawFood()
+return
+
 }
 
+let head={
+x:snake[0].x+dx,
+y:snake[0].y+dy
+}
 
-// wrap around screen
+if(head.x<0) head.x=580
+if(head.x>=600) head.x=0
+if(head.y<0) head.y=580
+if(head.y>=600) head.y=0
 
-if(head.x < 0) head.x = 580
-if(head.x >= 600) head.x = 0
-if(head.y < 0) head.y = 580
-if(head.y >= 600) head.y = 0
+for(let part of snake){
 
-
-for(let part of dragon){
-
-if(part.x==head.x && part.y==head.y){
+if(part.x===head.x && part.y===head.y){
 
 alert("Game Over")
 
-dragon=[{x:300,y:300}]
+snake=[{x:300,y:300}]
+dx=0
+dy=0
 score=0
+
 document.getElementById("score").innerText=score
 
 return
@@ -136,31 +198,72 @@ return
 
 }
 
-dragon.unshift(head)
+snake.unshift(head)
 
-if(head.x==pearl.x && head.y==pearl.y){
+if(head.x===food.x && head.y===food.y){
 
 score++
-
 document.getElementById("score").innerText=score
 
-pearl={
+food={
 x:Math.floor(Math.random()*30)*20,
 y:Math.floor(Math.random()*30)*20
 }
 
 }else{
 
-dragon.pop()
+snake.pop()
 
 }
 
-drawDragon()
-drawPearl()
+drawSnake()
+drawFood()
 
 }
 
 setInterval(game,120)
+
+
+
+function submitScore(){
+
+let name=document.getElementById("playerName").value
+
+let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
+
+scores.push({name:name,score:score})
+
+scores.sort((a,b)=>b.score-a.score)
+
+scores=scores.slice(0,10)
+
+localStorage.setItem("dragonScores",JSON.stringify(scores))
+
+showScores()
+
+}
+
+function showScores(){
+
+let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
+
+let list=document.getElementById("leaderboard")
+
+list.innerHTML=""
+
+scores.forEach(s=>{
+
+let li=document.createElement("li")
+
+li.innerText=s.name+" - "+s.score
+
+list.appendChild(li)
+
+})
+
+}
+
+showScores()
 
 </script>
 
