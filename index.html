@@ -29,28 +29,27 @@ border-radius:15px;
 background:#111;
 }
 
-.arcade-buttons{
+.arcade{
 display:flex;
 justify-content:center;
-gap:30px;
+gap:40px;
 margin-top:20px;
 flex-wrap:wrap;
 }
 
-.btn{
-padding:14px 22px;
+.gamebtn{
 background:#8000ff;
+padding:15px 25px;
 border-radius:10px;
 color:white;
 text-decoration:none;
 font-size:18px;
 font-weight:bold;
-transition:0.2s;
+display:inline-block;
 }
 
-.btn:hover{
+.gamebtn:hover{
 background:#b84dff;
-transform:scale(1.08);
 }
 
 button{
@@ -65,12 +64,6 @@ cursor:pointer;
 
 button:hover{
 background:#b84dff;
-}
-
-a{
-color:#00ffff;
-text-decoration:none;
-font-size:18px;
 }
 
 footer{
@@ -89,12 +82,9 @@ color:#888;
 </header>
 
 <div class="box">
-
 <h2>SMG TOKEN</h2>
 <p>The weapon of the Shmug empire.</p>
-
 <a href="#">Buy SMG</a>
-
 </div>
 
 <div class="box">
@@ -102,73 +92,32 @@ color:#888;
 <h2>🎮 SHMUG ARCADE</h2>
 <p>Retro web games from the Shmug universe.</p>
 
-<div class="arcade-buttons">
+<div class="arcade">
 
-<a class="btn" href="pandaman.html">🐼 Pandaman</a>
+<a class="gamebtn" href="pandaman.html">🐼 Pandaman</a>
 
-<a class="btn" href="rivercrossing.html">🌊 River Run</a>
+<a class="gamebtn" href="rivercrossing.html">🌊 River Run</a>
 
-<a class="btn" href="dragonpearl.html">🐉 Dragon Pearl</a>
+<a class="gamebtn" href="dragonpearl.html">🐉 Dragon Pearl</a>
 
 </div>
 
 </div>
 
 <div class="box">
-
 <h2>NFT COLLECTIONS</h2>
 <p>Pot Heads • Flags • Future drops</p>
-
 <a href="#">View NFTs</a>
-
 </div>
 
 <div class="box">
-
 <h2>Social</h2>
 <p>@chriskenny18075</p>
 
 <a href="https://x.com/chriskenny18075" target="_blank">
 <button>𝕏 Follow me on X</button>
 </a>
-
 </div>
-
-<div class="box">
-
-<h2>⛏ Mining Tools</h2>
-<p>Start mining and earning crypto.</p>
-
-<a href="https://gomining.com/?ref=1peot" target="_blank">
-<button>⚡ Start Mining</button>
-</a>
-
-<br><br>
-
-<a href="https://youtube.com/yourvideo" target="_blank">
-<button>🎥 Mining Videos</button>
-</a>
-
-<br><br>
-
-<button>📊 Mining Guide</button>
-
-</div>
-
-<div id="counter" style="margin-top:30px;"></div>
-
-<script>
-
-let visits = localStorage.getItem("visits") || 0
-
-visits++
-
-localStorage.setItem("visits", visits)
-
-document.getElementById("counter").innerHTML =
-"👁 Visitors: " + visits
-
-</script>
 
 <footer>
 Built on GitHub Pages
