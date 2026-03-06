@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Panda River Crossing</title>
+
+<style>
+
+body{
+background:#0b2e13;
+color:white;
+text-align:center;
+font-family:Arial;
+margin:0;
+}
+
+h1{
+color:#9cff9c;
+}
+
+#gameCanvas{
+background:#1f5e3b;
+border:6px solid #4CAF50;
+display:block;
+margin:auto;
+touch-action:none;
+}
+
+.controls{
+margin-top:15px;
+}
+
+button{
+font-size:26px;
+padding:15px 25px;
+margin:6px;
+border-radius:10px;
+border:none;
+background:#4CAF50;
+color:white;
+}
+
+button:active{
+background:#2e7d32;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🐼 Panda Crossing River</h1>
+
+<canvas id="gameCanvas" width="600" height="600"></canvas>
+
+<div class="controls">
+
+<div>
+<button onclick="move('up')">⬆</button>
+</div>
+
+<div>
+<button onclick="move('left')">⬅</button>
+<button onclick="move('down')">⬇</button>
+<button onclick="move('right')">➡</button>
+</div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const grid = 30;
+const tile = canvas.width / grid;
+
+let panda = {x:15,y:15};
+
+let coins = [];
+let score = 0;
+
+function spawnCoin(){
+
+coins.push({
+x:Math.floor(Math.random()*grid),
+y:Math.floor(Math.random()*grid)
+});
+
+}
+
+for(let i=0;i<5;i++) spawnCoin();
+
+function draw(){
+
+ctx.fillStyle="#2e8b57";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+drawRiver();
+drawCoins();
+drawPanda();
+
+}
+
+function drawRiver(){
+
+ctx.fillStyle="#1e90ff";
+
+for(let i=10;i<20;i++){
+
+ctx.fillRect(0,i*tile,canvas.width,tile);
+
+}
+
+}
+
+function drawPanda(){
+
+ctx.fillStyle="white";
+ctx.beginPath();
+ctx.arc(
+panda.x*tile + tile/2,
+panda.y*tile + tile/2,
+tile/2.2,
+0,
+Math.PI*2
+);
+ctx.fill();
+
+ctx.fillStyle="black";
+
+ctx.beginPath();
+ctx.arc(panda.x*tile+tile*0.35,panda.y*tile+tile*0.35,4,0,Math.PI*2);
+ctx.arc(panda.x*tile+tile*0.65,panda.y*tile+tile*0.35,4,0,Math.PI*2);
+ctx.fill();
+
+}
+
+function drawCoins(){
+
+ctx.fillStyle="gold";
+
+coins.forEach(c=>{
+
+ctx.beginPath();
+ctx.arc(
+c.x*tile+tile/2,
+c.y*tile+tile/2,
+tile/3,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+});
+
+}
+
+function move(dir){
+
+if(dir=="up") panda.y--;
+if(dir=="down") panda.y++;
+if(dir=="left") panda.x--;
+if(dir=="right") panda.x++;
+
+wrap();
+
+checkCoin();
+
+draw();
+
+}
+
+function wrap(){
+
+if(panda.x<0) panda.x=grid-1;
+if(panda.x>=grid) panda.x=0;
+if(panda.y<0) panda.y=grid-1;
+if(panda.y>=grid) panda.y=0;
+
+}
+
+function checkCoin(){
+
+coins = coins.filter(c=>{
+
+if(c.x==panda.x && c.y==panda.y){
+
+score++;
+spawnCoin();
+return false;
+
+}
+
+return true;
+
+});
+
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
