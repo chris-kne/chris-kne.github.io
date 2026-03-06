@@ -44,3 +44,5 @@ The Shmug Empire is a creative ecosystem mixing:
 
 CurioCity  
 Building strange things on the internet.
+![GitHub stars](https://img.shields.io/github/stars/yourname/repo)
+![License](https://img.shields.io/badge/license-MIT-green)
