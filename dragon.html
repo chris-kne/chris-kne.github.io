@@ -2,6 +2,8 @@
 <html>
 <head>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Dragon Pearl</title>
 
 <style>
@@ -20,8 +22,6 @@ box-shadow:0 0 25px purple;
 margin-top:20px;
 }
 
-/* bamboo buttons */
-
 .controls button{
 width:90px;
 height:90px;
@@ -36,8 +36,6 @@ border:2px solid #d4af37;
 .controls button:hover{
 background:#2e8b57;
 }
-
-/* leaderboard bamboo panel */
 
 .leaderboard{
 background:#1a1a1a;
@@ -114,7 +112,9 @@ const ctx=canvas.getContext("2d")
 let snake=[{x:300,y:300}]
 let food={x:200,y:200}
 
-let dx=0
+/* START MOVING IMMEDIATELY */
+
+let dx=20
 let dy=0
 
 let score=0
@@ -161,14 +161,6 @@ function game(){
 
 ctx.clearRect(0,0,600,600)
 
-if(dx===0 && dy===0){
-
-drawSnake()
-drawFood()
-return
-
-}
-
 let head={
 x:snake[0].x+dx,
 y:snake[0].y+dy
@@ -186,7 +178,7 @@ if(part.x===head.x && part.y===head.y){
 alert("Game Over")
 
 snake=[{x:300,y:300}]
-dx=0
+dx=20
 dy=0
 score=0
 
@@ -222,8 +214,6 @@ drawFood()
 }
 
 setInterval(game,120)
-
-
 
 function submitScore(){
 
