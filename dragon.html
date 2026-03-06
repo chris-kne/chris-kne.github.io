@@ -20,9 +20,11 @@ box-shadow:0 0 25px purple;
 margin-top:20px;
 }
 
-button{
-padding:10px;
-margin:5px;
+.controls button{
+width:80px;
+height:80px;
+font-size:24px;
+margin:6px;
 }
 
 </style>
@@ -33,63 +35,48 @@ margin:5px;
 
 <h1>🐉 Dragon Pearl</h1>
 
-<canvas id="game" width="800" height="800"></canvas>
+<canvas id="game" width="600" height="600"></canvas>
 
 <h2>Score: <span id="score">0</span></h2>
 
-<input id="playerName" placeholder="Your name">
+<div class="controls">
 
-<button onclick="submitScore()">Submit Score</button>
-<button onclick="restart()">Restart</button>
+<br>
+<button onclick="setDir(0,-20)">⬆</button>
+<br>
 
-<h3>Leaderboard</h3>
+<button onclick="setDir(-20,0)">⬅</button>
+<button onclick="setDir(20,0)">➡</button>
 
-<ul id="leaderboard"></ul>
+<br>
+<button onclick="setDir(0,20)">⬇</button>
+
+</div>
 
 <script>
 
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
 
-let dragon
-let pearl
-let dx
-let dy
-let score
-let running
+let dragon=[{x:300,y:300}]
+let pearl={x:200,y:200}
 
-const grid = 40   // bigger grid for bigger screen
+let dx=20
+let dy=0
 
-function start(){
+let score=0
 
-dragon=[{x:400,y:400}]
-pearl=randomPearl()
-
-dx=grid
-dy=0
-
-score=0
-running=true
-
-document.getElementById("score").innerText=score
-
-}
-
-function randomPearl(){
-
-return{
-x:Math.floor(Math.random()*20)*grid,
-y:Math.floor(Math.random()*20)*grid
-}
-
+function setDir(x,y){
+dx=x
+dy=y
 }
 
 document.addEventListener("keydown",function(e){
 
-if(e.key=="ArrowUp"){dx=0;dy=-grid}
-if(e.key=="ArrowDown"){dx=0;dy=grid}
-if(e.key=="ArrowLeft"){dx=-grid;dy=0}
-if(e.key=="ArrowRight"){dx=grid;dy=0}
+if(e.key=="ArrowUp") setDir(0,-20)
+if(e.key=="ArrowDown") setDir(0,20)
+if(e.key=="ArrowLeft") setDir(-20,0)
+if(e.key=="ArrowRight") setDir(20,0)
 
 })
 
@@ -99,7 +86,7 @@ dragon.forEach((part,i)=>{
 
 ctx.fillStyle = (i==0) ? "orange" : "lime"
 
-ctx.fillRect(part.x,part.y,grid,grid)
+ctx.fillRect(part.x,part.y,20,20)
 
 })
 
@@ -110,31 +97,39 @@ function drawPearl(){
 ctx.fillStyle="gold"
 
 ctx.beginPath()
-ctx.arc(pearl.x+grid/2,pearl.y+grid/2,grid/3,0,Math.PI*2)
+ctx.arc(pearl.x+10,pearl.y+10,8,0,Math.PI*2)
 ctx.fill()
 
 }
 
 function game(){
 
-if(!running) return
+ctx.clearRect(0,0,600,600)
 
-ctx.clearRect(0,0,800,800)
-
-let head={x:dragon[0].x+dx,y:dragon[0].y+dy}
-
-if(head.x<0 || head.x>=800 || head.y<0 || head.y>=800){
-
-gameOver()
-return
-
+let head={
+x:dragon[0].x+dx,
+y:dragon[0].y+dy
 }
+
+
+// wrap around screen
+
+if(head.x < 0) head.x = 580
+if(head.x >= 600) head.x = 0
+if(head.y < 0) head.y = 580
+if(head.y >= 600) head.y = 0
+
 
 for(let part of dragon){
 
 if(part.x==head.x && part.y==head.y){
 
-gameOver()
+alert("Game Over")
+
+dragon=[{x:300,y:300}]
+score=0
+document.getElementById("score").innerText=score
+
 return
 
 }
@@ -149,7 +144,10 @@ score++
 
 document.getElementById("score").innerText=score
 
-pearl=randomPearl()
+pearl={
+x:Math.floor(Math.random()*30)*20,
+y:Math.floor(Math.random()*30)*20
+}
 
 }else{
 
@@ -162,68 +160,7 @@ drawPearl()
 
 }
 
-function gameOver(){
-
-running=false
-
-ctx.fillStyle="red"
-ctx.font="60px Arial"
-ctx.fillText("GAME OVER",250,400)
-
-}
-
-function restart(){
-
-start()
-
-}
-
 setInterval(game,120)
-
-
-// leaderboard
-
-function submitScore(){
-
-let name=document.getElementById("playerName").value
-
-let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
-
-scores.push({name:name,score:score})
-
-scores.sort((a,b)=>b.score-a.score)
-
-scores=scores.slice(0,10)
-
-localStorage.setItem("dragonScores",JSON.stringify(scores))
-
-showScores()
-
-}
-
-function showScores(){
-
-let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
-
-let list=document.getElementById("leaderboard")
-
-list.innerHTML=""
-
-scores.forEach(s=>{
-
-let li=document.createElement("li")
-
-li.innerText=s.name+" - "+s.score
-
-list.appendChild(li)
-
-})
-
-}
-
-showScores()
-
-start()
 
 </script>
 
