@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
 
+<title>Dragon Pearl Arcade</title>
+
+<style>
+
+body{
+background:black;
+color:white;
+text-align:center;
+font-family:Arial;
+}
+
+canvas{
+background:#020010;
+border:3px solid purple;
+box-shadow:0 0 30px purple;
+margin-top:20px;
+touch-action:none;
+}
+
+.controls button{
+width:70px;
+height:70px;
+font-size:20px;
+margin:5px;
+}
+
+button{
+padding:10px 20px;
+margin:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🐉 Dragon Pearl Arcade</h1>
+
+<div id="visits"></div>
+
+<p>Controls: Arrow Keys • WASD • E S D X • Swipe</p>
+
+<button onclick="connectMetaMask()">Connect MetaMask</button>
+<button onclick="connectPhantom()">Connect Phantom</button>
+
+<p>Wallet: <span id="wallet">Not Connected</span></p>
+
+<canvas id="game" width="400" height="400"></canvas>
+
+<h2>Score: <span id="score">0</span></h2>
+
+<input id="playerName" placeholder="Enter name">
+
+<button onclick="submitScore()">Submit Score</button>
+
+<h3>Leaderboard</h3>
+
+<ul id="leaderboard"></ul>
+
+<div class="controls">
+
+<br>
+
+<button onclick="setDir(0,-20)">↑</button>
+
+<br>
+
+<button onclick="setDir(-20,0)">←</button>
+<button onclick="setDir(20,0)">→</button>
+
+<br>
+
+<button onclick="setDir(0,20)">↓</button>
+
+</div>
+
+<script>
+
+// visitor counter
+
+let visits = localStorage.getItem("visits") || 0
+visits++
+localStorage.setItem("visits", visits)
+
+document.getElementById("visits").innerText =
+"Visitors: " + visits
+
+
+// wallet
+
+let walletAddress = ""
+
+async function connectMetaMask(){
+
+if(window.ethereum){
+
+const accounts = await window.ethereum.request({
+method: "eth_requestAccounts"
+})
+
+walletAddress = accounts[0]
+
+document.getElementById("wallet").innerText =
+walletAddress
+
+}
+
+}
+
+function connectPhantom(){
+
+alert("Phantom support placeholder")
+
+}
+
+
+// game
+
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+
+let dragon=[{x:200,y:200}]
+let pearl={x:100,y:100}
+
+let dx=20
+let dy=0
+
+let score=0
+
+
+function setDir(x,y){
+
+dx=x
+dy=y
+
+}
+
+document.addEventListener("keydown",function(e){
+
+if(e.key=="ArrowUp"||e.key=="w"||e.key=="e")
+setDir(0,-20)
+
+if(e.key=="ArrowDown"||e.key=="s"||e.key=="x")
+setDir(0,20)
+
+if(e.key=="ArrowLeft"||e.key=="a")
+setDir(-20,0)
+
+if(e.key=="ArrowRight"||e.key=="d")
+setDir(20,0)
+
+})
+
+
+function drawDragon(){
+
+dragon.forEach((part,i)=>{
+
+ctx.fillStyle = (i==0) ? "orange" : "lime"
+
+ctx.fillRect(part.x,part.y,20,20)
+
+})
+
+}
+
+
+function drawPearl(){
+
+ctx.fillStyle="gold"
+
+ctx.beginPath()
+ctx.arc(pearl.x+10,pearl.y+10,8,0,Math.PI*2)
+ctx.fill()
+
+}
+
+
+function game(){
+
+ctx.clearRect(0,0,400,400)
+
+dragon.unshift({
+x:dragon[0].x+dx,
+y:dragon[0].y+dy
+})
+
+if(dragon[0].x==pearl.x && dragon[0].y==pearl.y){
+
+score++
+
+document.getElementById("score").innerText=score
+
+pearl={
+x:Math.floor(Math.random()*20)*20,
+y:Math.floor(Math.random()*20)*20
+}
+
+}else{
+
+dragon.pop()
+
+}
+
+drawDragon()
+drawPearl()
+
+}
+
+setInterval(game,120)
+
+
+// swipe
+
+let startX=0
+let startY=0
+
+canvas.addEventListener("touchstart",e=>{
+
+startX=e.touches[0].clientX
+startY=e.touches[0].clientY
+
+})
+
+canvas.addEventListener("touchend",e=>{
+
+let endX=e.changedTouches[0].clientX
+let endY=e.changedTouches[0].clientY
+
+let dxSwipe=endX-startX
+let dySwipe=endY-startY
+
+if(Math.abs(dxSwipe)>Math.abs(dySwipe)){
+
+if(dxSwipe>0)setDir(20,0)
+else setDir(-20,0)
+
+}else{
+
+if(dySwipe>0)setDir(0,20)
+else setDir(0,-20)
+
+}
+
+})
+
+
+// leaderboard
+
+function submitScore(){
+
+let name=document.getElementById("playerName").value
+
+let scores=JSON.parse(
+localStorage.getItem("dragonScores")
+) || []
+
+scores.push({
+name:name,
+score:score,
+wallet:walletAddress
+})
+
+scores.sort((a,b)=>b.score-a.score)
+
+scores=scores.slice(0,10)
+
+localStorage.setItem(
+"dragonScores",
+JSON.stringify(scores)
+)
+
+showScores()
+
+}
+
+
+function showScores(){
+
+let scores=JSON.parse(
+localStorage.getItem("dragonScores")
+) || []
+
+let list=document.getElementById("leaderboard")
+
+list.innerHTML=""
+
+scores.forEach(s=>{
+
+let li=document.createElement("li")
+
+li.innerText =
+s.name + " - " + s.score
+
+list.appendChild(li)
+
+})
+
+}
+
+showScores()
+
+</script>
+
+</body>
+</html>
