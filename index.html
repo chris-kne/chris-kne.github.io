@@ -29,6 +29,30 @@ border-radius:15px;
 background:#111;
 }
 
+.arcade-buttons{
+display:flex;
+justify-content:center;
+gap:30px;
+margin-top:20px;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:14px 22px;
+background:#8000ff;
+border-radius:10px;
+color:white;
+text-decoration:none;
+font-size:18px;
+font-weight:bold;
+transition:0.2s;
+}
+
+.btn:hover{
+background:#b84dff;
+transform:scale(1.08);
+}
+
 button{
 padding:15px 25px;
 background:#8000ff;
@@ -56,7 +80,6 @@ color:#888;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -73,6 +96,12 @@ color:#888;
 <a href="#">Buy SMG</a>
 
 </div>
+
+<div class="box">
+
+<h2>🎮 SHMUG ARCADE</h2>
+<p>Retro web games from the Shmug universe.</p>
+
 <div class="arcade-buttons">
 
 <a class="btn" href="pandaman.html">🐼 Pandaman</a>
@@ -83,18 +112,11 @@ color:#888;
 
 </div>
 
-<h2>🎮 SHMUG ARCADE</h2>
-
-<p>Retro web games from the Shmug universe.</p>
-
-<
-
 </div>
 
 <div class="box">
 
 <h2>NFT COLLECTIONS</h2>
-
 <p>Pot Heads • Flags • Future drops</p>
 
 <a href="#">View NFTs</a>
@@ -104,35 +126,36 @@ color:#888;
 <div class="box">
 
 <h2>Social</h2>
-
 <p>@chriskenny18075</p>
 
 <a href="https://x.com/chriskenny18075" target="_blank">
 <button>𝕏 Follow me on X</button>
 </a>
+
+</div>
+
 <div class="box">
 
 <h2>⛏ Mining Tools</h2>
-
 <p>Start mining and earning crypto.</p>
 
 <a href="https://gomining.com/?ref=1peot" target="_blank">
 <button>⚡ Start Mining</button>
 </a>
 
+<br><br>
+
 <a href="https://youtube.com/yourvideo" target="_blank">
 <button>🎥 Mining Videos</button>
 </a>
+
+<br><br>
+
 <button>📊 Mining Guide</button>
-</a>
 
-<a href="#">
-<button>🎥 Mining Videos</button>
-</a>
+</div>
 
-  <div>
-    
-  <div id="counter" style="margin-top:30px;"></div>
+<div id="counter" style="margin-top:30px;"></div>
 
 <script>
 
@@ -146,16 +169,10 @@ document.getElementById("counter").innerHTML =
 "👁 Visitors: " + visits
 
 </script>
-  
 
 <footer>
-
 Built on GitHub Pages
-
-</⚡ Start Mining
-📺 How to Mine
-🔗 Referral Links
-💰 Profit Calculatorfooter>
+</footer>
 
 </body>
 </html>
