@@ -1,158 +1,256 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Panda Crypto Man</title>
 
 <style>
+
 body{
 background:black;
 color:white;
 text-align:center;
 font-family:Arial;
+touch-action:none;
+overflow:hidden;
 }
 
 canvas{
-background:#111;
+background:#000;
 border:4px solid #00ff99;
+width:95vw;
+height:65vh;
+}
+
+.controls{
 margin-top:10px;
 }
 
-button{
-font-size:22px;
+.controls button{
+width:70px;
+height:70px;
+font-size:28px;
 margin:6px;
-padding:12px;
 border-radius:10px;
 border:none;
 background:#00ff99;
 }
+
+.logo{
+position:fixed;
+bottom:10px;
+width:60px;
+opacity:0.9;
+}
+
+#logoLeft{ left:10px; }
+#logoRight{ right:10px; }
+
 </style>
+
 </head>
 
 <body>
 
 <h2>🐼 Panda Crypto Man</h2>
-Score: <span id="score">0</span>
+
+Score: <span id="score">0</span> | Level: <span id="level">1</span>
 
 <br>
 
-<canvas id="game" width="400" height="400"></canvas>
+<canvas id="game" width="420" height="420"></canvas>
 
-<br>
+<div class="controls">
 
-<button onclick="move('left')">⬅</button>
-<button onclick="move('up')">⬆</button>
-<button onclick="move('down')">⬇</button>
-<button onclick="move('right')">➡</button>
+<button onclick="setDir(-1,0)">⬅</button>
+<button onclick="setDir(0,-1)">⬆</button>
+<button onclick="setDir(0,1)">⬇</button>
+<button onclick="setDir(1,0)">➡</button>
+
+</div>
+
+<img src="rabbit.png" class="logo" id="logoLeft">
+<img src="rabbit.png" class="logo" id="logoRight">
 
 <script>
+
+document.addEventListener("touchmove", e => e.preventDefault(), {passive:false})
 
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
 
-let panda = {x:200,y:200,size:16}
-let dir = "right"
+const tile = 30
 
 let score = 0
+let level = 1
 
-let coins=[]
-let ghosts=[]
+let panda = {x:1,y:1}
+let dir = {x:0,y:0}
 
-for(let i=0;i<40;i++){
-coins.push({
-x:Math.random()*380,
-y:Math.random()*380
+const maze = [
+
+"##############",
+"#............#",
+"#.####..####.#",
+"#............#",
+"#.##.####.##.#",
+"#............#",
+"#.####..####.#",
+"#............#",
+"##############"
+
+]
+
+let dots = []
+
+function spawnDots(){
+
+dots=[]
+
+maze.forEach((row,y)=>{
+row.split("").forEach((c,x)=>{
+if(c==".") dots.push({x,y})
 })
+})
+
 }
 
-function spawnGhost(){
-const types=["BTC","DOGE","PEPE","ETH"]
+spawnDots()
 
-ghosts.push({
-x:Math.random()*380,
-y:Math.random()*380,
-type:types[Math.floor(Math.random()*types.length)],
-size:18
-})
-}
+let enemies = [
 
-setInterval(spawnGhost,4000)
+{x:12,y:1},
+{x:12,y:7}
 
-function move(d){
-dir=d
+]
+
+function setDir(x,y){
+dir={x,y}
 }
 
 document.addEventListener("keydown",e=>{
-if(e.key=="ArrowLeft") dir="left"
-if(e.key=="ArrowRight") dir="right"
-if(e.key=="ArrowUp") dir="up"
-if(e.key=="ArrowDown") dir="down"
+if(e.key=="ArrowLeft") setDir(-1,0)
+if(e.key=="ArrowRight") setDir(1,0)
+if(e.key=="ArrowUp") setDir(0,-1)
+if(e.key=="ArrowDown") setDir(0,1)
 })
 
 function update(){
 
-if(dir=="left") panda.x-=3
-if(dir=="right") panda.x+=3
-if(dir=="up") panda.y-=3
-if(dir=="down") panda.y+=3
+let nx = panda.x + dir.x
+let ny = panda.y + dir.y
 
-if(panda.x<0) panda.x=400
-if(panda.x>400) panda.x=0
-if(panda.y<0) panda.y=400
-if(panda.y>400) panda.y=0
+if(maze[ny] && maze[ny][nx] != "#"){
+panda.x = nx
+panda.y = ny
+}
 
-coins.forEach((c,i)=>{
-if(Math.abs(panda.x-c.x)<14 && Math.abs(panda.y-c.y)<14){
-coins.splice(i,1)
-score+=1
-document.getElementById("score").innerText=score
+dots.forEach((d,i)=>{
+if(d.x==panda.x && d.y==panda.y){
+dots.splice(i,1)
+score++
+document.getElementById("score").innerText = score
 }
 })
 
-ghosts.forEach((g,i)=>{
-if(Math.abs(panda.x-g.x)<18 && Math.abs(panda.y-g.y)<18){
-score+=20
-ghosts.splice(i,1)
-document.getElementById("score").innerText=score
+if(dots.length==0){
+
+level++
+document.getElementById("level").innerText = level
+
+spawnDots()
+
+enemies.push({
+x:12,
+y:4
+})
+
 }
+
+enemies.forEach(e=>{
+
+if(Math.random()<0.4){
+
+if(e.x<panda.x) e.x++
+else if(e.x>panda.x) e.x--
+
+if(e.y<panda.y) e.y++
+else if(e.y>panda.y) e.y--
+
+}
+
+if(e.x==panda.x && e.y==panda.y){
+
+alert("Game Over")
+
+panda={x:1,y:1}
+score=0
+level=1
+
+document.getElementById("score").innerText=score
+document.getElementById("level").innerText=level
+
+spawnDots()
+
+}
+
 })
 
 }
 
 function draw(){
 
-ctx.clearRect(0,0,400,400)
+ctx.clearRect(0,0,420,420)
 
-coins.forEach(c=>{
-ctx.fillStyle="#00ff99"
-ctx.beginPath()
-ctx.arc(c.x,c.y,4,0,Math.PI*2)
-ctx.fill()
+maze.forEach((row,y)=>{
+
+row.split("").forEach((c,x)=>{
+
+if(c=="#"){
+ctx.fillStyle="#003333"
+ctx.fillRect(x*tile,y*tile,tile,tile)
+}
+
 })
 
-ghosts.forEach(g=>{
-ctx.fillStyle="#ff44ff"
-ctx.font="12px Arial"
-ctx.fillText(g.type,g.x,g.y)
+})
+
+dots.forEach(d=>{
+ctx.fillStyle="#00ff99"
+ctx.beginPath()
+ctx.arc(d.x*tile+15,d.y*tile+15,4,0,Math.PI*2)
+ctx.fill()
 })
 
 ctx.fillStyle="white"
 ctx.beginPath()
-ctx.arc(panda.x,panda.y,panda.size,0,Math.PI*2)
+ctx.arc(panda.x*tile+15,panda.y*tile+15,12,0,Math.PI*2)
 ctx.fill()
 
 ctx.fillStyle="black"
 ctx.beginPath()
-ctx.arc(panda.x-5,panda.y-5,3,0,Math.PI*2)
-ctx.arc(panda.x+5,panda.y-5,3,0,Math.PI*2)
+ctx.arc(panda.x*tile+10,panda.y*tile+12,3,0,Math.PI*2)
+ctx.arc(panda.x*tile+20,panda.y*tile+12,3,0,Math.PI*2)
 ctx.fill()
+
+enemies.forEach(e=>{
+ctx.fillStyle="red"
+ctx.beginPath()
+ctx.arc(e.x*tile+15,e.y*tile+15,10,0,Math.PI*2)
+ctx.fill()
+})
 
 }
 
 function gameLoop(){
+
 update()
 draw()
+
 requestAnimationFrame(gameLoop)
+
 }
 
 gameLoop()
