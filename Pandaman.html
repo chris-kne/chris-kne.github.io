@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,7 +19,7 @@ overflow:hidden;
 }
 
 canvas{
-background:#000;
+background:#111;
 border:4px solid #00ff99;
 width:95vw;
 height:65vh;
@@ -50,7 +51,7 @@ Score: <span id="score">0</span>
 
 <br>
 
-<canvas id="game" width="480" height="480"></canvas>
+<canvas id="game" width="400" height="400"></canvas>
 
 <div class="controls">
 
@@ -65,128 +66,172 @@ Score: <span id="score">0</span>
 
 document.addEventListener("touchmove", e => e.preventDefault(), {passive:false})
 
-const canvas = document.getElementById("game")
-const ctx = canvas.getContext("2d")
+const canvas=document.getElementById("game")
+const ctx=canvas.getContext("2d")
 
-const tile = 24
+let panda={x:200,y:200}
 
-let panda = {x:1,y:1}
-let dir = "right"
-let score = 0
-let gameOver = false
+let dir="right"
 
-const maze = [
+let score=0
 
-"####################",
-"#........#.........#",
-"#.####...#...####..#",
-"#..................#",
-"#.####.#.#.#.####..#",
-"#......#...#.......#",
-"#.####.#####.####..#",
-"#..................#",
-"####################"
+let coins=[]
 
-]
+let levelComplete=false
 
-let dots=[]
+function spawnCoins(){
 
-maze.forEach((row,y)=>{
-row.split("").forEach((c,x)=>{
-if(c==".") dots.push({x,y})
-})
+coins=[]
+
+for(let i=0;i<40;i++){
+
+coins.push({
+x:Math.random()*380,
+y:Math.random()*380
 })
 
-document.addEventListener("keydown",e=>{
-if(e.key=="ArrowLeft") dir="left"
-if(e.key=="ArrowRight") dir="right"
-if(e.key=="ArrowUp") dir="up"
-if(e.key=="ArrowDown") dir="down"
-})
+}
+
+}
+
+spawnCoins()
 
 function update(){
 
-if(gameOver) return
+if(levelComplete) return
 
-let nx=panda.x
-let ny=panda.y
+if(dir=="left") panda.x-=3
+if(dir=="right") panda.x+=3
+if(dir=="up") panda.y-=3
+if(dir=="down") panda.y+=3
 
-if(dir=="left") nx--
-if(dir=="right") nx++
-if(dir=="up") ny--
-if(dir=="down") ny++
+if(panda.x<0) panda.x=400
+if(panda.x>400) panda.x=0
+if(panda.y<0) panda.y=400
+if(panda.y>400) panda.y=0
 
-if(maze[ny] && maze[ny][nx] !== "#"){
-panda.x=nx
-panda.y=ny
-}
+coins.forEach((c,i)=>{
 
-dots.forEach((d,i)=>{
-if(d.x==panda.x && d.y==panda.y){
-dots.splice(i,1)
+if(Math.abs(panda.x-c.x)<14 && Math.abs(panda.y-c.y)<14){
+
+coins.splice(i,1)
+
 score++
+
 document.getElementById("score").innerText=score
+
 }
+
 })
 
-if(dots.length===0){
-gameOver=true
+if(coins.length===0){
+
+levelComplete=true
+
 }
 
 }
 
 function draw(){
 
-ctx.clearRect(0,0,480,480)
+ctx.clearRect(0,0,400,400)
 
-maze.forEach((row,y)=>{
-row.split("").forEach((c,x)=>{
-if(c=="#"){
-ctx.fillStyle="#003333"
-ctx.fillRect(x*tile,y*tile,tile,tile)
-}
-})
-})
+/* coins */
 
-dots.forEach(d=>{
+coins.forEach(c=>{
+
 ctx.fillStyle="#00ff99"
+
 ctx.beginPath()
-ctx.arc(d.x*tile+12,d.y*tile+12,4,0,Math.PI*2)
+
+ctx.arc(c.x,c.y,4,0,Math.PI*2)
+
 ctx.fill()
+
 })
+
+/* panda face */
 
 ctx.fillStyle="white"
+
 ctx.beginPath()
-ctx.arc(panda.x*tile+12,panda.y*tile+12,10,0,Math.PI*2)
+
+ctx.arc(panda.x,panda.y,16,0,Math.PI*2)
+
 ctx.fill()
 
 ctx.fillStyle="black"
+
+/* ears */
+
 ctx.beginPath()
-ctx.arc(panda.x*tile+8,panda.y*tile+10,3,0,Math.PI*2)
-ctx.arc(panda.x*tile+16,panda.y*tile+10,3,0,Math.PI*2)
+ctx.arc(panda.x-10,panda.y-12,6,0,Math.PI*2)
+ctx.arc(panda.x+10,panda.y-12,6,0,Math.PI*2)
 ctx.fill()
 
-if(gameOver){
+/* eye patches */
+
+ctx.beginPath()
+ctx.ellipse(panda.x-6,panda.y-2,4,6,0,0,Math.PI*2)
+ctx.ellipse(panda.x+6,panda.y-2,4,6,0,0,Math.PI*2)
+ctx.fill()
 
 ctx.fillStyle="white"
-ctx.font="40px Arial"
-ctx.fillText("LEVEL COMPLETE",90,220)
 
-ctx.font="20px Arial"
-ctx.fillText("Tap to restart",170,260)
+/* eyes */
+
+ctx.beginPath()
+ctx.arc(panda.x-6,panda.y-2,2,0,Math.PI*2)
+ctx.arc(panda.x+6,panda.y-2,2,0,Math.PI*2)
+ctx.fill()
+
+ctx.fillStyle="black"
+
+/* nose */
+
+ctx.beginPath()
+ctx.arc(panda.x,panda.y+5,2,0,Math.PI*2)
+ctx.fill()
+
+if(levelComplete){
+
+ctx.fillStyle="white"
+
+ctx.font="30px Arial"
+
+ctx.fillText("LEVEL COMPLETE",70,200)
+
+ctx.font="18px Arial"
+
+ctx.fillText("Tap to play again",120,230)
 
 }
 
 }
 
-let lastMove = 0
-const speed = 150
+canvas.addEventListener("click",()=>{
+
+if(levelComplete){
+
+spawnCoins()
+
+levelComplete=false
+
+}
+
+})
+
+let lastMove=0
+const speed=40
 
 function loop(time){
 
 if(time-lastMove>speed){
+
 update()
+
 lastMove=time
+
 }
 
 draw()
@@ -194,10 +239,6 @@ draw()
 requestAnimationFrame(loop)
 
 }
-
-canvas.addEventListener("click",()=>{
-if(gameOver) location.reload()
-})
 
 loop()
 
