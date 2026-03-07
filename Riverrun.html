@@ -2,6 +2,8 @@
 <html>
 <head>
 
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
 <title>Panda River Crossing</title>
 
 <style>
@@ -11,20 +13,30 @@ background:black;
 color:white;
 text-align:center;
 font-family:Arial;
+touch-action:none;
+overflow:hidden;
 }
 
 canvas{
 background:#001a33;
 border:4px solid #d4af37;
 box-shadow:0 0 25px #d4af37;
-margin-top:20px;
+margin-top:10px;
+width:95vw;
+height:60vh;
+}
+
+/* controls placed UNDER game */
+
+.controls{
+margin-top:10px;
 }
 
 .controls button{
-width:100px;
-height:100px;
-font-size:36px;
-margin:8px;
+width:70px;
+height:70px;
+font-size:28px;
+margin:6px;
 border-radius:12px;
 background:#2e8b57;
 color:white;
@@ -37,25 +49,24 @@ border:3px solid #d4af37;
 
 <body>
 
-<h1>🐼 Panda River Crossing</h1>
+<h2>🐼 Panda River Crossing</h2>
 
-<canvas id="game" width="800" height="800"></canvas>
+<canvas id="game" width="800" height="600"></canvas>
 
-<h2>Score: <span id="score">0</span></h2>
+<h3>Score: <span id="score">0</span></h3>
 
 <div class="controls">
 
-<br>
-<button onclick="move(0,-50)">⬆</button>
+<button onclick="move(0,-80)">⬆</button>
 
 <br>
 
-<button onclick="move(-50,0)">⬅</button>
-<button onclick="move(50,0)">➡</button>
+<button onclick="move(-80,0)">⬅</button>
+<button onclick="move(80,0)">➡</button>
 
 <br>
 
-<button onclick="move(0,50)">⬇</button>
+<button onclick="move(0,80)">⬇</button>
 
 </div>
 
@@ -64,23 +75,25 @@ border:3px solid #d4af37;
 const canvas=document.getElementById("game")
 const ctx=canvas.getContext("2d")
 
-let panda={x:380,y:720}
+let panda={x:380,y:520}
 
 let score=0
 
+/* slower logs */
+
 let logs=[
-{x:0,y:420,speed:3},
-{x:300,y:340,speed:-3},
-{x:200,y:260,speed:4},
-{x:500,y:180,speed:-2}
+{x:0,y:320,speed:1.2},
+{x:300,y:260,speed:-1},
+{x:200,y:200,speed:1.4},
+{x:500,y:140,speed:-0.8}
 ]
 
 document.addEventListener("keydown",e=>{
 
-if(e.key=="ArrowUp") move(0,-50)
-if(e.key=="ArrowDown") move(0,50)
-if(e.key=="ArrowLeft") move(-50,0)
-if(e.key=="ArrowRight") move(50,0)
+if(e.key=="ArrowUp") move(0,-80)
+if(e.key=="ArrowDown") move(0,80)
+if(e.key=="ArrowLeft") move(-80,0)
+if(e.key=="ArrowRight") move(80,0)
 
 })
 
@@ -89,23 +102,29 @@ function move(x,y){
 panda.x+=x
 panda.y+=y
 
+if(panda.x<0)panda.x=0
+if(panda.x>760)panda.x=760
+if(panda.y>520)panda.y=520
+
 }
 
 function draw(){
 
-ctx.clearRect(0,0,800,800)
+ctx.clearRect(0,0,800,600)
+
+/* grass */
 
 ctx.fillStyle="green"
-ctx.fillRect(0,0,800,100)
+ctx.fillRect(0,0,800,80)
 
-ctx.fillStyle="green"
-ctx.fillRect(0,700,800,100)
+ctx.fillRect(0,520,800,80)
+
+/* river */
 
 ctx.fillStyle="blue"
-ctx.fillRect(0,100,800,600)
+ctx.fillRect(0,80,800,440)
 
-ctx.fillStyle="white"
-ctx.fillRect(panda.x,panda.y,40,40)
+/* logs */
 
 logs.forEach(log=>{
 
@@ -119,6 +138,17 @@ ctx.fillRect(log.x,log.y,150,40)
 
 })
 
+/* panda */
+
+ctx.fillStyle="white"
+ctx.fillRect(panda.x,panda.y,40,40)
+
+ctx.fillStyle="black"
+ctx.fillRect(panda.x+10,panda.y+10,8,8)
+ctx.fillRect(panda.x+22,panda.y+10,8,8)
+
+/* check log safety */
+
 let safe=false
 
 logs.forEach(log=>{
@@ -128,38 +158,29 @@ panda.y===log.y &&
 panda.x+40>log.x &&
 panda.x<log.x+150
 ){
-
 safe=true
 panda.x+=log.speed
-
 }
 
 })
 
-if(panda.y>100 && panda.y<700 && !safe){
+if(panda.y>80 && panda.y<520 && !safe){
 
 alert("🐼 Splash!")
 
-panda={x:380,y:720}
-
+panda={x:380,y:520}
 score=0
 document.getElementById("score").innerText=score
 
 }
 
-if(panda.y<100){
+if(panda.y<80){
 
 score++
-
 document.getElementById("score").innerText=score
-
-panda={x:380,y:720}
+panda={x:380,y:520}
 
 }
-
-ctx.fillStyle="black"
-ctx.fillRect(panda.x+10,panda.y+10,8,8)
-ctx.fillRect(panda.x+22,panda.y+10,8,8)
 
 }
 
