@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,7 +21,7 @@ canvas{
 background:#000;
 border:4px solid #00ff99;
 width:95vw;
-height:70vh;
+height:65vh;
 }
 
 .controls{
@@ -38,16 +37,6 @@ border-radius:10px;
 border:none;
 background:#00ff99;
 }
-
-.logo{
-position:fixed;
-bottom:10px;
-width:60px;
-opacity:0.8;
-}
-
-#logoLeft{ left:10px; }
-#logoRight{ right:10px; }
 
 </style>
 
@@ -72,9 +61,6 @@ Score: <span id="score">0</span>
 
 </div>
 
-<img src="rabbit.png" class="logo" id="logoLeft">
-<img src="rabbit.png" class="logo" id="logoRight">
-
 <script>
 
 document.addEventListener("touchmove", e => e.preventDefault(), {passive:false})
@@ -82,11 +68,12 @@ document.addEventListener("touchmove", e => e.preventDefault(), {passive:false})
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
 
-const size = 24
+const tile = 24
 
 let panda = {x:1,y:1}
 let dir = "right"
 let score = 0
+let gameOver = false
 
 const maze = [
 
@@ -119,6 +106,8 @@ if(e.key=="ArrowDown") dir="down"
 
 function update(){
 
+if(gameOver) return
+
 let nx=panda.x
 let ny=panda.y
 
@@ -127,11 +116,9 @@ if(dir=="right") nx++
 if(dir=="up") ny--
 if(dir=="down") ny++
 
-if(maze[ny] && maze[ny][nx]!=""){
-if(maze[ny][nx]!="#"){
+if(maze[ny] && maze[ny][nx] !== "#"){
 panda.x=nx
 panda.y=ny
-}
 }
 
 dots.forEach((d,i)=>{
@@ -141,6 +128,10 @@ score++
 document.getElementById("score").innerText=score
 }
 })
+
+if(dots.length===0){
+gameOver=true
+}
 
 }
 
@@ -152,7 +143,7 @@ maze.forEach((row,y)=>{
 row.split("").forEach((c,x)=>{
 if(c=="#"){
 ctx.fillStyle="#003333"
-ctx.fillRect(x*size,y*size,size,size)
+ctx.fillRect(x*tile,y*tile,tile,tile)
 }
 })
 })
@@ -160,31 +151,53 @@ ctx.fillRect(x*size,y*size,size,size)
 dots.forEach(d=>{
 ctx.fillStyle="#00ff99"
 ctx.beginPath()
-ctx.arc(d.x*size+12,d.y*size+12,4,0,Math.PI*2)
+ctx.arc(d.x*tile+12,d.y*tile+12,4,0,Math.PI*2)
 ctx.fill()
 })
 
 ctx.fillStyle="white"
 ctx.beginPath()
-ctx.arc(panda.x*size+12,panda.y*size+12,10,0,Math.PI*2)
+ctx.arc(panda.x*tile+12,panda.y*tile+12,10,0,Math.PI*2)
 ctx.fill()
 
 ctx.fillStyle="black"
 ctx.beginPath()
-ctx.arc(panda.x*size+8,panda.y*size+10,3,0,Math.PI*2)
-ctx.arc(panda.x*size+16,panda.y*size+10,3,0,Math.PI*2)
+ctx.arc(panda.x*tile+8,panda.y*tile+10,3,0,Math.PI*2)
+ctx.arc(panda.x*tile+16,panda.y*tile+10,3,0,Math.PI*2)
 ctx.fill()
+
+if(gameOver){
+
+ctx.fillStyle="white"
+ctx.font="40px Arial"
+ctx.fillText("LEVEL COMPLETE",90,220)
+
+ctx.font="20px Arial"
+ctx.fillText("Tap to restart",170,260)
 
 }
 
-function loop(){
+}
 
+let lastMove = 0
+const speed = 150
+
+function loop(time){
+
+if(time-lastMove>speed){
 update()
+lastMove=time
+}
+
 draw()
 
 requestAnimationFrame(loop)
 
 }
+
+canvas.addEventListener("click",()=>{
+if(gameOver) location.reload()
+})
 
 loop()
 
