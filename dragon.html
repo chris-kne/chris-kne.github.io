@@ -1,103 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <title>Dragon Pearl</title>
-
 <style>
 body{
-    margin:0;
-    background:black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+background:black;
+color:white;
+text-align:center;
+font-family:monospace;
 }
 
 canvas{
-    border:6px solid gold;
-    background:#000014;
-    max-width:95vw;
-    max-height:90vh;
+background:#111;
+border:2px solid lime;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="game"></canvas>
+<h1>🐉 Dragon Pearl</h1>
+<p>Collect the pearls. Don't hit the wall.</p>
+
+<canvas id="game" width="400" height="400"></canvas>
 
 <script>
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 400;
-canvas.height = 400;
+let grid = 20;
+let count = 0;
 
-let dragon = {x:200,y:200,size:20};
-let pearl = {x:100,y:100,size:10};
+let snake = {
+x:160,
+y:160,
+dx:grid,
+dy:0,
+cells:[],
+maxCells:4
+};
 
-let dx=0;
-let dy=0;
+let pearl = {
+x:320,
+y:320
+};
 
-document.addEventListener("keydown",e=>{
- if(e.key=="ArrowUp"){dx=0;dy=-5}
- if(e.key=="ArrowDown"){dx=0;dy=5}
- if(e.key=="ArrowLeft"){dx=-5;dy=0}
- if(e.key=="ArrowRight"){dx=5;dy=0}
-});
-
-function spawnPearl(){
- pearl.x = Math.random()*380;
- pearl.y = Math.random()*380;
-}
-
-function drawDragon(){
- ctx.fillStyle="lime";
- ctx.beginPath();
- ctx.arc(dragon.x,dragon.y,dragon.size,0,Math.PI*2);
- ctx.fill();
-}
-
-function drawPearl(){
- ctx.fillStyle="gold";
- ctx.beginPath();
- ctx.arc(pearl.x,pearl.y,pearl.size,0,Math.PI*2);
- ctx.fill();
-}
-
-function update(){
-
- dragon.x+=dx;
- dragon.y+=dy;
-
- if(dragon.x<0)dragon.x=0;
- if(dragon.y<0)dragon.y=0;
- if(dragon.x>400)dragon.x=400;
- if(dragon.y>400)dragon.y=400;
-
- let dist=Math.hypot(dragon.x-pearl.x,dragon.y-pearl.y);
-
- if(dist<25){
-  spawnPearl();
- }
-
+function getRandomInt(min,max){
+return Math.floor(Math.random()*(max-min))+min;
 }
 
 function gameLoop(){
+requestAnimationFrame(gameLoop);
 
- ctx.clearRect(0,0,canvas.width,canvas.height);
+if(++count<4){
+return;
+}
 
- update();
- drawDragon();
- drawPearl();
+count=0;
 
- requestAnimationFrame(gameLoop);
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+snake.x+=snake.dx;
+snake.y+=snake.dy;
+
+if(snake.x<0) snake.x=canvas.width-grid;
+if(snake.x>=canvas.width) snake.x=0;
+if(snake.y<0) snake.y=canvas.height-grid;
+if(snake.y>=canvas.height) snake.y=0;
+
+snake.cells.unshift({x:snake.x,y:snake.y});
+
+if(snake.cells.length>snake.maxCells){
+snake.cells.pop();
+}
+
+ctx.fillStyle="gold";
+ctx.fillRect(pearl.x,pearl.y,grid-1,grid-1);
+
+ctx.fillStyle="lime";
+
+snake.cells.forEach(function(cell,index){
+
+ctx.fillRect(cell.x,cell.y,grid-1,grid-1);
+
+if(cell.x===pearl.x && cell.y===pearl.y){
+
+snake.maxCells++;
+
+pearl.x=getRandomInt(0,20)*grid;
+pearl.y=getRandomInt(0,20)*grid;
 
 }
 
-gameLoop();
+for(let i=index+1;i<snake.cells.length;i++){
+
+if(cell.x===snake.cells[i].x && cell.y===snake.cells[i].y){
+
+snake.x=160;
+snake.y=160;
+snake.cells=[];
+snake.maxCells=4;
+snake.dx=grid;
+snake.dy=0;
+
+}
+
+}
+
+});
+
+}
+
+document.addEventListener("keydown",function(e){
+
+if(e.which===37 && snake.dx===0){
+snake.dx=-grid;
+snake.dy=0;
+}
+else if(e.which===38 && snake.dy===0){
+snake.dy=-grid;
+snake.dx=0;
+}
+else if(e.which===39 && snake.dx===0){
+snake.dx=grid;
+snake.dy=0;
+}
+else if(e.which===40 && snake.dy===0){
+snake.dy=grid;
+snake.dx=0;
+}
+
+});
+
+requestAnimationFrame(gameLoop);
 
 </script>
 
