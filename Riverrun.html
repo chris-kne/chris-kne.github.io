@@ -8,31 +8,24 @@ body{
 background:black;
 color:white;
 text-align:center;
-font-family:sans-serif;
-}
-
-h1{
-margin-top:10px;
+font-family:Arial;
 }
 
 canvas{
-background:#0b4f7a;
-border:6px solid gold;
+background:#1e5c85;
+border:4px solid gold;
 box-shadow:0 0 20px gold;
-border-radius:10px;
-}
-
-.controls{
-margin-top:15px;
+display:block;
+margin:auto;
 }
 
 button{
-font-size:30px;
-padding:15px 25px;
-margin:5px;
-border-radius:10px;
+font-size:24px;
+margin:10px;
+padding:10px 20px;
+background:#2ecc71;
 border:none;
-background:#3a8f5a;
+border-radius:10px;
 color:white;
 }
 </style>
@@ -40,124 +33,78 @@ color:white;
 
 <body>
 
-<h1>🐼 Panda River Crossing</h1>
+<h2>🐼 Panda River Crossing</h2>
 
-<canvas id="game" width="360" height="500"></canvas>
+<canvas id="game" width="350" height="500"></canvas>
 
-<h2 id="score">Score: 0</h2>
+<br>
 
-<div class="controls">
-<button onclick="moveLeft()">⬅</button>
-<button onclick="moveUp()">⬆</button>
-<button onclick="moveRight()">➡</button>
-</div>
+<button onclick="move(-1)">⬅</button>
+<button onclick="jump()">⬆</button>
+<button onclick="move(1)">➡</button>
 
 <script>
 
-const canvas = document.getElementById("game")
-const ctx = canvas.getContext("2d")
+const canvas=document.getElementById("game")
+const ctx=canvas.getContext("2d")
 
-let panda = {
-x:180,
+let panda={
+x:175,
 y:450,
-size:28
+size:20
 }
 
-let score = 0
-
-let logs = [
-{y:380,x:0,speed:1},
-{y:300,x:200,speed:-1.2},
-{y:220,x:100,speed:1.5},
-{y:140,x:50,speed:-1}
+let logs=[
+{x:40,y:380,w:100},
+{x:200,y:300,w:100},
+{x:80,y:220,w:100},
+{x:200,y:140,w:100}
 ]
 
-function drawPanda(){
+function draw(){
+
+ctx.clearRect(0,0,350,500)
+
+logs.forEach(log=>{
+ctx.fillStyle="#c9a14a"
+ctx.fillRect(log.x,log.y,log.w,15)
+})
 
 ctx.fillStyle="white"
 ctx.beginPath()
 ctx.arc(panda.x,panda.y,panda.size,0,Math.PI*2)
 ctx.fill()
 
-ctx.fillStyle="black"
-
-ctx.beginPath()
-ctx.arc(panda.x-10,panda.y-10,7,0,Math.PI*2)
-ctx.arc(panda.x+10,panda.y-10,7,0,Math.PI*2)
-ctx.fill()
-
-ctx.beginPath()
-ctx.arc(panda.x-6,panda.y,3,0,Math.PI*2)
-ctx.arc(panda.x+6,panda.y,3,0,Math.PI*2)
-ctx.fill()
-
 }
 
-function drawLogs(){
-
-ctx.fillStyle="#caa74f"
-
-logs.forEach(log=>{
-
-ctx.fillRect(log.x,log.y,120,20)
-
-log.x+=log.speed
-
-if(log.x>canvas.width) log.x=-120
-if(log.x<-120) log.x=canvas.width
-
-})
+function move(dir){
+panda.x+=dir*25
 }
 
-function drawRiver(){
+function jump(){
 
-ctx.fillStyle="#0b4f7a"
-ctx.fillRect(0,80,360,350)
+panda.y-=80
 
-ctx.fillStyle="#2e8b57"
-ctx.fillRect(0,0,360,80)
+for(let log of logs){
 
-ctx.fillRect(0,430,360,70)
-
-}
-
-function update(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-drawRiver()
-drawLogs()
-drawPanda()
-
-requestAnimationFrame(update)
-
-}
-
-function moveUp(){
-
-panda.y -= 40
+if(
+panda.x>log.x &&
+panda.x<log.x+log.w &&
+panda.y>log.y-30 &&
+panda.y<log.y+30
+){
 score++
+}
+}
 
-document.getElementById("score").innerText="Score: "+score
-
-if(panda.y < 80){
+if(panda.y<40){
 alert("YOU WIN 🐼")
 location.reload()
 }
 
 }
 
-function moveLeft(){
-
-panda.x -= 40
-}
-
-function moveRight(){
-
-panda.x += 40
-}
-
-update()
+setInterval(draw,30)
 
 </script>
 
