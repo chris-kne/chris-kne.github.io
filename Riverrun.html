@@ -9,7 +9,7 @@
 <style>
 
 body{
-background:black;
+background:#0b0b0b;
 color:white;
 text-align:center;
 font-family:Arial;
@@ -18,15 +18,13 @@ overflow:hidden;
 }
 
 canvas{
-background:#001a33;
+background:#003355;
 border:4px solid #d4af37;
 box-shadow:0 0 25px #d4af37;
 margin-top:10px;
 width:95vw;
 height:60vh;
 }
-
-/* controls placed UNDER game */
 
 .controls{
 margin-top:10px;
@@ -79,13 +77,22 @@ let panda={x:380,y:520}
 
 let score=0
 
-/* slower logs */
+/* bamboo logs */
 
 let logs=[
-{x:0,y:320,speed:1.2},
-{x:300,y:260,speed:-1},
-{x:200,y:200,speed:1.4},
-{x:500,y:140,speed:-0.8}
+
+{x:0,y:420,speed:1.6},
+{x:260,y:420,speed:1.6},
+
+{x:150,y:340,speed:-1.4},
+{x:520,y:340,speed:-1.4},
+
+{x:100,y:260,speed:1.9},
+{x:460,y:260,speed:1.9},
+
+{x:50,y:180,speed:-1.2},
+{x:400,y:180,speed:-1.2}
+
 ]
 
 document.addEventListener("keydown",e=>{
@@ -108,44 +115,87 @@ if(panda.y>520)panda.y=520
 
 }
 
+function drawPanda(x,y){
+
+/* head */
+
+ctx.fillStyle="white"
+ctx.beginPath()
+ctx.arc(x+20,y+25,20,0,Math.PI*2)
+ctx.fill()
+
+/* ears */
+
+ctx.fillStyle="black"
+ctx.beginPath()
+ctx.arc(x+6,y+8,8,0,Math.PI*2)
+ctx.arc(x+34,y+8,8,0,Math.PI*2)
+ctx.fill()
+
+/* eye patches */
+
+ctx.beginPath()
+ctx.arc(x+12,y+24,7,0,Math.PI*2)
+ctx.arc(x+28,y+24,7,0,Math.PI*2)
+ctx.fill()
+
+/* eyes */
+
+ctx.fillStyle="white"
+ctx.beginPath()
+ctx.arc(x+12,y+24,3,0,Math.PI*2)
+ctx.arc(x+28,y+24,3,0,Math.PI*2)
+ctx.fill()
+
+/* nose */
+
+ctx.fillStyle="black"
+ctx.beginPath()
+ctx.arc(x+20,y+32,3,0,Math.PI*2)
+ctx.fill()
+
+}
+
 function draw(){
 
 ctx.clearRect(0,0,800,600)
 
 /* grass */
 
-ctx.fillStyle="green"
+ctx.fillStyle="#2e8b57"
 ctx.fillRect(0,0,800,80)
-
 ctx.fillRect(0,520,800,80)
 
 /* river */
 
-ctx.fillStyle="blue"
+ctx.fillStyle="#004477"
 ctx.fillRect(0,80,800,440)
 
-/* logs */
+/* bamboo logs */
 
 logs.forEach(log=>{
 
 log.x+=log.speed
 
-if(log.x>800) log.x=-150
-if(log.x<-150) log.x=800
+if(log.x>800) log.x=-200
+if(log.x<-200) log.x=800
 
-ctx.fillStyle="brown"
-ctx.fillRect(log.x,log.y,150,40)
+ctx.fillStyle="#c2a34a"
+ctx.fillRect(log.x,log.y,200,40)
+
+/* bamboo rings */
+
+ctx.fillStyle="#8b7a2f"
+
+for(let i=0;i<4;i++){
+ctx.fillRect(log.x+(i*50),log.y,6,40)
+}
 
 })
 
 /* panda */
 
-ctx.fillStyle="white"
-ctx.fillRect(panda.x,panda.y,40,40)
-
-ctx.fillStyle="black"
-ctx.fillRect(panda.x+10,panda.y+10,8,8)
-ctx.fillRect(panda.x+22,panda.y+10,8,8)
+drawPanda(panda.x,panda.y)
 
 /* check log safety */
 
@@ -156,10 +206,12 @@ logs.forEach(log=>{
 if(
 panda.y===log.y &&
 panda.x+40>log.x &&
-panda.x<log.x+150
+panda.x<log.x+200
 ){
+
 safe=true
 panda.x+=log.speed
+
 }
 
 })
@@ -169,15 +221,20 @@ if(panda.y>80 && panda.y<520 && !safe){
 alert("🐼 Splash!")
 
 panda={x:380,y:520}
+
 score=0
 document.getElementById("score").innerText=score
 
 }
 
+/* reach top */
+
 if(panda.y<80){
 
 score++
+
 document.getElementById("score").innerText=score
+
 panda={x:380,y:520}
 
 }
