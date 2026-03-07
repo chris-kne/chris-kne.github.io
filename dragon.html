@@ -1,259 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta charset="UTF-8">
 <title>Dragon Pearl</title>
 
 <style>
-
 body{
-background:#0a0a0a;
-color:white;
-text-align:center;
-font-family:Arial;
+    margin:0;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
 }
 
 canvas{
-background:#020010;
-border:4px solid #b8860b;
-box-shadow:0 0 25px purple;
-margin-top:20px;
+    border:6px solid gold;
+    background:#000014;
+    max-width:95vw;
+    max-height:90vh;
 }
-
-.controls button{
-width:90px;
-height:90px;
-font-size:28px;
-margin:8px;
-border-radius:12px;
-background:linear-gradient(#3a7d3a,#1f4f1f);
-color:white;
-border:2px solid #d4af37;
-}
-
-.controls button:hover{
-background:#2e8b57;
-}
-
-.leaderboard{
-background:#1a1a1a;
-border:3px solid #d4af37;
-width:300px;
-margin:auto;
-padding:10px;
-border-radius:10px;
-box-shadow:0 0 15px #d4af37;
-}
-
-input{
-padding:8px;
-margin:5px;
-}
-
-button.submit{
-background:#b8860b;
-color:black;
-border:none;
-padding:10px;
-border-radius:6px;
-}
-
 </style>
-
 </head>
 
 <body>
 
-<h2>🐉 Dragon Pearl</h2>
-
-<canvas id="game" width="600" height="600"></canvas>
-
-<h3>Score: <span id="score">0</span></h3>
-
-<div class="controls">
-
-<br>
-<button onclick="setDir(0,-20)">⬆</button>
-
-<br>
-
-<button onclick="setDir(-20,0)">⬅</button>
-<button onclick="setDir(20,0)">➡</button>
-
-<br>
-
-<button onclick="setDir(0,20)">⬇</button>
-
-</div>
-
-<br>
-
-<div class="leaderboard">
-
-<h3>🏮 Bamboo Leaderboard</h3>
-
-<input id="playerName" placeholder="Your name">
-
-<br>
-
-<button class="submit" onclick="submitScore()">Submit Score</button>
-
-<ul id="leaderboard"></ul>
-
-</div>
+<canvas id="game"></canvas>
 
 <script>
 
-const canvas=document.getElementById("game")
-const ctx=canvas.getContext("2d")
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-let snake=[{x:300,y:300}]
-let food={x:200,y:200}
+canvas.width = 400;
+canvas.height = 400;
 
-/* START MOVING IMMEDIATELY */
+let dragon = {x:200,y:200,size:20};
+let pearl = {x:100,y:100,size:10};
 
-let dx=20
-let dy=0
+let dx=0;
+let dy=0;
 
-let score=0
+document.addEventListener("keydown",e=>{
+ if(e.key=="ArrowUp"){dx=0;dy=-5}
+ if(e.key=="ArrowDown"){dx=0;dy=5}
+ if(e.key=="ArrowLeft"){dx=-5;dy=0}
+ if(e.key=="ArrowRight"){dx=5;dy=0}
+});
 
-function setDir(x,y){
+function spawnPearl(){
+ pearl.x = Math.random()*380;
+ pearl.y = Math.random()*380;
+}
 
-dx=x
-dy=y
+function drawDragon(){
+ ctx.fillStyle="lime";
+ ctx.beginPath();
+ ctx.arc(dragon.x,dragon.y,dragon.size,0,Math.PI*2);
+ ctx.fill();
+}
+
+function drawPearl(){
+ ctx.fillStyle="gold";
+ ctx.beginPath();
+ ctx.arc(pearl.x,pearl.y,pearl.size,0,Math.PI*2);
+ ctx.fill();
+}
+
+function update(){
+
+ dragon.x+=dx;
+ dragon.y+=dy;
+
+ if(dragon.x<0)dragon.x=0;
+ if(dragon.y<0)dragon.y=0;
+ if(dragon.x>400)dragon.x=400;
+ if(dragon.y>400)dragon.y=400;
+
+ let dist=Math.hypot(dragon.x-pearl.x,dragon.y-pearl.y);
+
+ if(dist<25){
+  spawnPearl();
+ }
 
 }
 
-document.addEventListener("keydown",function(e){
+function gameLoop(){
 
-if(e.key=="ArrowUp") setDir(0,-20)
-if(e.key=="ArrowDown") setDir(0,20)
-if(e.key=="ArrowLeft") setDir(-20,0)
-if(e.key=="ArrowRight") setDir(20,0)
+ ctx.clearRect(0,0,canvas.width,canvas.height);
 
-})
+ update();
+ drawDragon();
+ drawPearl();
 
-function drawSnake(){
-
-snake.forEach((part,i)=>{
-
-ctx.fillStyle = (i==0) ? "orange" : "lime"
-
-ctx.fillRect(part.x,part.y,20,20)
-
-})
+ requestAnimationFrame(gameLoop);
 
 }
 
-function drawFood(){
-
-ctx.fillStyle="gold"
-
-ctx.beginPath()
-ctx.arc(food.x+10,food.y+10,8,0,Math.PI*2)
-ctx.fill()
-
-}
-
-function game(){
-
-ctx.clearRect(0,0,600,600)
-
-let head={
-x:snake[0].x+dx,
-y:snake[0].y+dy
-}
-
-if(head.x<0) head.x=580
-if(head.x>=600) head.x=0
-if(head.y<0) head.y=580
-if(head.y>=600) head.y=0
-
-for(let part of snake){
-
-if(part.x===head.x && part.y===head.y){
-
-alert("Game Over")
-
-snake=[{x:300,y:300}]
-dx=20
-dy=0
-score=0
-
-document.getElementById("score").innerText=score
-
-return
-
-}
-
-}
-
-snake.unshift(head)
-
-if(head.x===food.x && head.y===food.y){
-
-score++
-document.getElementById("score").innerText=score
-
-food={
-x:Math.floor(Math.random()*30)*20,
-y:Math.floor(Math.random()*30)*20
-}
-
-}else{
-
-snake.pop()
-
-}
-
-drawSnake()
-drawFood()
-
-}
-
-setInterval(game,120)
-
-function submitScore(){
-
-let name=document.getElementById("playerName").value
-
-let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
-
-scores.push({name:name,score:score})
-
-scores.sort((a,b)=>b.score-a.score)
-
-scores=scores.slice(0,10)
-
-localStorage.setItem("dragonScores",JSON.stringify(scores))
-
-showScores()
-
-}
-
-function showScores(){
-
-let scores=JSON.parse(localStorage.getItem("dragonScores"))||[]
-
-let list=document.getElementById("leaderboard")
-
-list.innerHTML=""
-
-scores.forEach(s=>{
-
-let li=document.createElement("li")
-
-li.innerText=s.name+" - "+s.score
-
-list.appendChild(li)
-
-})
-
-}
-
-showScores()
+gameLoop();
 
 </script>
 
