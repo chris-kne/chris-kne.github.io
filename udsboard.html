@@ -1,0 +1,105 @@
+import { useState, useEffect } from "react";
+
+export default function Dashboard() { const [oil, setOil] = useState(0); const [businesses, setBusinesses] = useState([]); const [drivers, setDrivers] = useState([]); const [name, setName] = useState(""); const [address, setAddress] = useState(""); const [contact, setContact] = useState(""); const [driverName, setDriverName] = useState("");
+
+const co2Saved = (oil * 2.5).toFixed(2); const fuel = (oil * 0.8).toFixed(2);
+
+useEffect(() => { const savedBiz = localStorage.getItem("businesses"); const savedDrivers = localStorage.getItem("drivers"); if (savedBiz) setBusinesses(JSON.parse(savedBiz)); if (savedDrivers) setDrivers(JSON.parse(savedDrivers)); }, []);
+
+useEffect(() => { localStorage.setItem("businesses", JSON.stringify(businesses)); }, [businesses]);
+
+useEffect(() => { localStorage.setItem("drivers", JSON.stringify(drivers)); }, [drivers]);
+
+const addBusiness = () => { if (!name) return; setBusinesses([...businesses, { name, address, contact }]); setName(""); setAddress(""); setContact(""); };
+
+const addDriver = () => { if (!driverName) return; setDrivers([...drivers, { name: driverName, oil: 0 }]); setDriverName(""); };
+
+const addOilToDriver = (index, amount) => { const updated = [...drivers]; updated[index].oil += amount; setDrivers(updated); };
+
+const sortedDrivers = [...drivers].sort((a, b) => b.oil - a.oil);
+
+return ( <div className="min-h-screen bg-black text-white p-6"> <h1 className="text-3xl font-bold mb-6">Ugly Ducks Society Dashboard</h1>
+
+{/* Stats */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="bg-gray-900 p-4 rounded-2xl">
+      <h2>Total Oil (L)</h2>
+      <p className="text-2xl">{oil}</p>
+    </div>
+    <div className="bg-gray-900 p-4 rounded-2xl">
+      <h2>CO2 Saved</h2>
+      <p className="text-2xl">{co2Saved} kg</p>
+    </div>
+    <div className="bg-gray-900 p-4 rounded-2xl">
+      <h2>Fuel Produced</h2>
+      <p className="text-2xl">{fuel} L</p>
+    </div>
+  </div>
+
+  {/* Calculator */}
+  <div className="bg-gray-900 p-4 rounded-2xl mb-6">
+    <h2 className="mb-2">Oil Calculator</h2>
+    <input
+      type="number"
+      placeholder="Enter litres"
+      className="text-black p-2 rounded w-full"
+      onChange={(e) => setOil(Number(e.target.value))}
+    />
+  </div>
+
+  {/* Add Business */}
+  <div className="bg-gray-900 p-4 rounded-2xl mb-6">
+    <h2 className="mb-2">Add Business</h2>
+    <input placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} className="text-black p-2 rounded w-full mb-2" />
+    <input placeholder="Address" value={address} onChange={(e)=>setAddress(e.target.value)} className="text-black p-2 rounded w-full mb-2" />
+    <input placeholder="Contact" value={contact} onChange={(e)=>setContact(e.target.value)} className="text-black p-2 rounded w-full mb-2" />
+    <button onClick={addBusiness} className="bg-purple-600 px-4 py-2 rounded">Add Business</button>
+  </div>
+
+  {/* Businesses */}
+  <div className="bg-gray-900 p-4 rounded-2xl mb-6">
+    <h2 className="mb-2">Businesses</h2>
+    {businesses.map((b, i) => (
+      <div key={i} className="border-b border-gray-700 py-2">
+        <p>{b.name}</p>
+        <p className="text-sm text-gray-400">{b.address}</p>
+        <p className="text-sm text-gray-400">{b.contact}</p>
+      </div>
+    ))}
+  </div>
+
+  {/* Drivers */}
+  <div className="bg-gray-900 p-4 rounded-2xl mb-6">
+    <h2 className="mb-2">Drivers</h2>
+    <input placeholder="Driver Name" value={driverName} onChange={(e)=>setDriverName(e.target.value)} className="text-black p-2 rounded w-full mb-2" />
+    <button onClick={addDriver} className="bg-blue-600 px-4 py-2 rounded mb-4">Add Driver</button>
+
+    {drivers.map((d, i) => (
+      <div key={i} className="flex justify-between items-center border-b border-gray-700 py-2">
+        <span>{d.name} ({d.oil} L)</span>
+        <button onClick={() => addOilToDriver(i, 10)} className="bg-green-600 px-2 py-1 rounded">+10L</button>
+      </div>
+    ))}
+  </div>
+
+  {/* Map */}
+  <div className="bg-gray-900 p-4 rounded-2xl mb-6">
+    <h2 className="mb-2">Route Map</h2>
+    <div className="h-40 bg-gray-800 flex items-center justify-center">
+      (Map integration ready - connect Google Maps API)
+    </div>
+  </div>
+
+  {/* Leaderboard */}
+  <div className="bg-gray-900 p-4 rounded-2xl">
+    <h2 className="mb-2">Leaderboard</h2>
+    {sortedDrivers.map((d, i) => (
+      <div key={i} className="flex justify-between border-b border-gray-700 py-2">
+        <span>#{i+1} {d.name}</span>
+        <span>{d.oil} L</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+); }
